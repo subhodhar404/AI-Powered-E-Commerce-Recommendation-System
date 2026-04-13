@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Relator AI | Authentication{% endblock %}
+
+{% block content %}
+<section class="authentication-area gray-bg authentication-height d-flex align-items-center justify-content-center">
+  <div class="container">
+    <div class="row">
+      <div class="col-xxl-8 offset-xxl-2 col-xl-8 offset-xl-2 col-lg-10 offset-lg-1">
+        <div class="row authentication-bg">
+          <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 d-none d-md-block">
+            <div class="auth-icon text-center pt-50">
+              <i class="fa-solid fa-fingerprint" id="loginIcon"></i>
+              <i class="fa-solid fa-user-plus d-none" id="registerIcon"></i>
+            </div>
+          </div>
+          <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6">
+            <div class="auth-tabs">
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab">Log in</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab">Register</button>
+                </li>
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane show active" id="home-tab-pane" role="tabpanel" tabindex="0">
+                  <div class="auth-form">
+                    <form action="#" method="post">
+                      <div class="auth-input mb-10">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="name@example@gmail.com" autofocus required>
+                      </div>
+                      <div class="auth-input mb-10">
+                        <label for="password">Password <span><a href="#">Forget Password?</a></span></label>
+                        <input type="password" id="password" placeholder="********" required>
+                      </div>
+                      <div class="auth-button mt-10">
+                        <button class="shake-btn" type="submit">Sign in</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div class="tab-pane" id="profile-tab-pane" role="tabpanel" tabindex="0">
+                  <div class="auth-form">
+                    <form action="#" method="post">
+                      <div class="auth-input mb-10">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" placeholder="Enter Your Full Name" required>
+                      </div>
+                      <div class="auth-input mb-10">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" placeholder="name@example@gmail.com" required>
+                      </div>
+                      <div class="auth-input mb-10">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" placeholder="********" required>
+                      </div>
+                      <div class="auth-button mt-10">
+                        <button class="shake-btn" type="submit">Register Now</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

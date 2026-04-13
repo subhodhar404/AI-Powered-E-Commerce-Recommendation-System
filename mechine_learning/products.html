@@ -1,0 +1,442 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title>This is Title.</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <!-- ALL CSS HERE -->
+  <link rel="stylesheet" href="css/fontawesome-all.min.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/nice-select.css">
+  <link rel="stylesheet" href="css/meanmenu.css">
+  <link rel="stylesheet" href="css/default.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+
+  <!-- Add your site or application content here -->
+  <!-- header start here -->
+  <header>
+    <div class="header-area">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-xxl-3 col-xl-3 col-lg-3">
+            <div class="header-area-logo">
+              <a href="index.html"><img src="img/logo/logo-color.png" alt="Relator Ai"></a>
+            </div>
+          </div>
+          <div class="col-xxl-9 col-xl-9 col-lg-9">
+            <div class="header-area-main-menu header-area-main-menu-two text-end">
+              <nav id="mobile-menu">
+                <ul>
+                  <li><a href="index.html">Home</a></li>
+                  <li><a href="products.html">Browse Product</a></li>
+                  <li><a href="recommandation.html">Recommandation</a></li>
+                  <li><a href="about.html">About</a></li>
+                  <li><a href="authentication.html">Profile</a>
+                    <ul>
+                      <li>
+                        <div class="profile-info d-flex align-items-center">
+                          <div class="profile-thumb">
+                            <img src="img/products/user-thumb.png" alt="">
+                          </div>
+                          <div class="profile-details">
+                            <h3>Tanvir Hasan</h3>
+                            <span>tanvirhasan.mahin@gmail.com</span>
+                            <a href="authentication.html">Log Out</a>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+          <div class="mobile-menu"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- header start end -->
+
+  <main>
+    <!-- products area start here -->
+    <section class="products-area pt-50 pb-70 fix">
+      <div class="product-details-popup">
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+          aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">HP 15.6 inch Windows 11 Laptop intel Core i3-N305
+                  8GB RAM 256GB SSD Natural Silver</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6">
+                    <div class="product-details-img">
+                      <span class="zoom d-unset"><img src="img/products/product1.jpg" alt=""></span>
+                    </div>
+                  </div>
+                  <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6">
+                    <div class="product-desc">
+                      <span>$433.99</span>
+                      <div class="product-ratings mb-10">
+                        <a href="#"><i class="fa-solid fa-star"></i></a>
+                        <a href="#"><i class="fa-solid fa-star"></i></a>
+                        <a href="#"><i class="fa-solid fa-star"></i></a>
+                        <a href="#"><i class="fa-solid fa-star"></i></a>
+                        <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+                      </div>
+                      <h3>HP 15.6 inch Windows 11 Laptop intel Core i3-N305 8GB RAM 256GB SSD Natural
+                        Silver</h3>
+                      <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Similique fugiat deleniti
+                        architecto itaque. Eos laboriosam repellat unde quasi asperiores sint magni, eveniet, hic esse
+                        doloremque temporibus dicta animi laudantium sed.</p>
+                      <a class="default-btn" href="#">Like <i class="fa-solid fa-thumbs-up"></i></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <div class="row mb-20">
+          <div class="col-xxl-6 col-xl-6 col-12">
+            <div class="section-title mb-30">
+              <h3>Browse Products</h3>
+              <span>Explore your products.</span>
+            </div>
+          </div>
+          <div class="col-xxl-6 col-xl-6 col-12">
+            <div class="product-actions d-flex align-items-center justify-content-between">
+              <div class="product-search">
+                <form action="#" method="post">
+                  <input type="text" placeholder="Search your product" autofocus>
+                  <button type="submit"><i class="fa-solid fa-magnifying-glass shake-btn"></i></button>
+                </form>
+              </div>
+              <div class="product-filter">
+                <select name="product" id="product">
+                  <option value="*">Show All</option>
+                  <option value="1">Price Low To High</option>
+                  <option value="2">Price High To Low</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
+            <div class="single-product">
+              <div class="product-img">
+                <a class="zoom" href="#"><img src="img/products/product1.jpg" alt=""></a>
+                <div class="product-tags">
+                  <span>New Arrival Product</span>
+                </div>
+              </div>
+              <div class="product-content">
+                <span>$433.99</span>
+                <div class="product-ratings mb-10">
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+                </div>
+                <h3><a href="#">HP 15.6 inch Windows 11 Laptop intel Core i3-N305 8GB RAM 256GB SSD Natural Silver</a>
+                </h3>
+                <div class="product-link">
+                  <a class="default-btn shake-btn" data-bs-toggle="modal" data-bs-target="#staticBackdrop" href="#">Show
+                    Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
+            <div class="single-product">
+              <div class="product-img">
+                <a class="zoom" href="#"><img src="img/products/product2.jpg" alt=""></a>
+                <div class="product-tags">
+                  <span>New Arrival Product</span>
+                </div>
+              </div>
+              <div class="product-content">
+                <span>$433.99</span>
+                <div class="product-ratings mb-10">
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+                </div>
+                <h3><a href="#">Skytech King 95 Gaming PC Desktop AMD Ryzen 7 9800X3D NVIDIA GeForce RTX 5070 2TB Gen4
+                    NVMe SSD 32GB DDR5 RAM, AIO Liquid Cooling Windows 11</a></h3>
+                <div class="product-link">
+                  <a class="default-btn shake-btn" href="#">Show Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
+            <div class="single-product">
+              <div class="product-img">
+                <a class="zoom" href="#"><img src="img/products/product3.jpg" alt=""></a>
+                <div class="product-tags">
+                  <span>New Arrival Product</span>
+                </div>
+              </div>
+              <div class="product-content">
+                <span>$433.99</span>
+                <div class="product-ratings mb-10">
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+                </div>
+                <h3><a href="#">KTC H27E6 27-Inch Gaming Monitor, 2K QHD 320Hz Fast IPS, HDR400, 1ms Response Time, HDMI
+                    2.1 & DP 1.4, Adjustable Height/Pivot/Swivel/Tilt, White for Esports & PC Gaming</a></h3>
+                <div class="product-link">
+                  <a class="default-btn shake-btn" href="#">Show Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
+            <div class="single-product">
+              <div class="product-img">
+                <a class="zoom" href="#"><img src="img/products/product1.jpg" alt=""></a>
+                <div class="product-tags">
+                  <span>New Arrival Product</span>
+                </div>
+              </div>
+              <div class="product-content">
+                <span>$433.99</span>
+                <div class="product-ratings mb-10">
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+                </div>
+                <h3><a href="#">HP 15.6 inch Windows 11 Laptop intel Core i3-N305 8GB RAM 256GB SSD Natural Silver</a>
+                </h3>
+                <div class="product-link">
+                  <a class="default-btn shake-btn" href="#">Show Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
+            <div class="single-product">
+              <div class="product-img">
+                <a class="zoom" href="#"><img src="img/products/product2.jpg" alt=""></a>
+                <div class="product-tags">
+                  <span>New Arrival Product</span>
+                </div>
+              </div>
+              <div class="product-content">
+                <span>$433.99</span>
+                <div class="product-ratings mb-10">
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+                </div>
+                <h3><a href="#">Skytech King 95 Gaming PC Desktop AMD Ryzen 7 9800X3D NVIDIA GeForce RTX 5070 2TB Gen4
+                    NVMe SSD 32GB DDR5 RAM, AIO Liquid Cooling Windows 11</a></h3>
+                <div class="product-link">
+                  <a class="default-btn shake-btn" href="#">Show Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
+            <div class="single-product">
+              <div class="product-img">
+                <a class="zoom" href="#"><img src="img/products/product3.jpg" alt=""></a>
+                <div class="product-tags">
+                  <span>New Arrival Product</span>
+                </div>
+              </div>
+              <div class="product-content">
+                <span>$433.99</span>
+                <div class="product-ratings mb-10">
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+                </div>
+                <h3><a href="#">KTC H27E6 27-Inch Gaming Monitor, 2K QHD 320Hz Fast IPS, HDR400, 1ms Response Time, HDMI
+                    2.1 & DP 1.4, Adjustable Height/Pivot/Swivel/Tilt, White for Esports & PC Gaming</a></h3>
+                <div class="product-link">
+                  <a class="default-btn shake-btn" href="#">Show Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
+            <div class="single-product">
+              <div class="product-img">
+                <a class="zoom" href="#"><img src="img/products/product1.jpg" alt=""></a>
+                <div class="product-tags">
+                  <span>New Arrival Product</span>
+                </div>
+              </div>
+              <div class="product-content">
+                <span>$433.99</span>
+                <div class="product-ratings mb-10">
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+                </div>
+                <h3><a href="#">HP 15.6 inch Windows 11 Laptop intel Core i3-N305 8GB RAM 256GB SSD Natural Silver</a>
+                </h3>
+                <div class="product-link">
+                  <a class="default-btn shake-btn" href="#">Show Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
+            <div class="single-product">
+              <div class="product-img">
+                <a class="zoom" href="#"><img src="img/products/product2.jpg" alt=""></a>
+                <div class="product-tags">
+                  <span>New Arrival Product</span>
+                </div>
+              </div>
+              <div class="product-content">
+                <span>$433.99</span>
+                <div class="product-ratings mb-10">
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+                </div>
+                <h3><a href="#">Skytech King 95 Gaming PC Desktop AMD Ryzen 7 9800X3D NVIDIA GeForce RTX 5070 2TB Gen4
+                    NVMe SSD 32GB DDR5 RAM, AIO Liquid Cooling Windows 11</a></h3>
+                <div class="product-link">
+                  <a class="default-btn shake-btn" href="#">Show Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
+            <div class="single-product">
+              <div class="product-img">
+                <a class="zoom" href="#"><img src="img/products/product3.jpg" alt=""></a>
+                <div class="product-tags">
+                  <span>New Arrival Product</span>
+                </div>
+              </div>
+              <div class="product-content">
+                <span>$433.99</span>
+                <div class="product-ratings mb-10">
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star"></i></a>
+                  <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+                </div>
+                <h3><a href="#">KTC H27E6 27-Inch Gaming Monitor, 2K QHD 320Hz Fast IPS, HDR400, 1ms Response Time, HDMI
+                    2.1 & DP 1.4, Adjustable Height/Pivot/Swivel/Tilt, White for Esports & PC Gaming</a></h3>
+                <div class="product-link">
+                  <a class="default-btn shake-btn" href="#">Show Details</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xxl-12">
+            <div class="product-pagination pt-60">
+              <nav>
+                <ul class="pagination justify-content-center">
+                  <li><a href="#">Previous</a></li>
+                  <li><a class="active" href="#">1</a></li>
+                  <li><a href="#">2</a></li>
+                  <li><a href="#">3</a></li>
+                  <li><a href="#">Next</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- products area end here -->
+  </main>
+
+  <!-- footer start here -->
+  <footer>
+    <div class="footer-area pt-30">
+      <div class="container">
+        <div class="row">
+          <div class="col-xxl-8 offset-xxl-2">
+            <div class="footer-weiget mb-20">
+              <div class="footer-menu text-center">
+                <nav>
+                  <ul>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="terms.html">Terms</a></li>
+                    <li><a href="privacy.html">Privacy</a></li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="copyright-area">
+      <div class="container">
+        <div class="row">
+          <div class="col-xxl-12">
+            <div class="copyright-text text-center">
+              <p>Copyright ©2026 by <a href="index.html">Relator Ai</a>. All Rights Reserved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- footer end here -->
+
+
+  <!-- ALL JS HERE -->
+  <script src="js/jquery-1.12.4.min.js"></script>
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="js/jquery.nice-select.min.js"></script>
+  <script src="js/jquery.zoom.min.js"></script>
+  <script src="js/jquery.meanmenu.min.js"></script>
+  <script src="js/plugins.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

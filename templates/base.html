@@ -1,0 +1,146 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Relator AI{% endblock %}</title>
+  <meta name="description" content="Hybrid e-commerce recommendation system using Flask and machine learning">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome-all.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/nice-select.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/meanmenu.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/default.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+  <style>
+    .stat-card, .helper-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      padding: 28px;
+      height: 100%;
+    }
+    .stat-card h3, .helper-card h3 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .stat-number {
+      color: #ff5a3c;
+      font-size: 30px;
+      font-weight: 700;
+      margin-bottom: 0;
+    }
+    .search-stack input,
+    .search-stack select {
+      margin-bottom: 14px;
+    }
+    .dynamic-grid .single-product {
+      height: 100%;
+    }
+    .product-img img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+    }
+    .product-content h3 {
+      min-height: 72px;
+    }
+    .empty-state {
+      background: #fff7f5;
+      border: 1px solid #ffd0c4;
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 24px;
+    }
+    .metric-badge {
+      display: inline-block;
+      padding: 8px 14px;
+      background: #f5f7ff;
+      border-radius: 999px;
+      margin: 6px 10px 0 0;
+      font-weight: 600;
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <div class="header-area {% block header_class %}{% endblock %}">
+      <div class="container {% block header_container_class %}{% endblock %}">
+        <div class="row align-items-center">
+          <div class="col-xxl-3 col-xl-3 col-lg-3">
+            <div class="header-area-logo">
+              <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='img/logo/logo-color.png') }}" alt="Relator AI">
+              </a>
+            </div>
+          </div>
+          <div class="col-xxl-9 col-xl-9 col-lg-9">
+            <div class="header-area-main-menu header-area-main-menu-two text-end">
+              <nav id="mobile-menu">
+                <ul>
+                  <li><a href="{{ url_for('home') }}">Home</a></li>
+                  <li><a href="{{ url_for('products_page') }}">Browse Product</a></li>
+                  <li><a href="{{ url_for('recommendation_page') }}">Recommendation</a></li>
+                  <li><a href="{{ url_for('about_page') }}">About</a></li>
+                  <li><a href="{{ url_for('authentication_page') }}">Login / Sign Up</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+          <div class="mobile-menu"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <div class="footer-area pt-30">
+      <div class="container">
+        <div class="row">
+          <div class="col-xxl-8 offset-xxl-2">
+            <div class="footer-weiget mb-20">
+              <div class="footer-menu text-center">
+                <nav>
+                  <ul>
+                    <li><a href="{{ url_for('about_page') }}">About</a></li>
+                    <li><a href="{{ url_for('products_page') }}">Products</a></li>
+                    <li><a href="{{ url_for('recommendation_page') }}">Recommendation</a></li>
+                    <li><a href="{{ url_for('authentication_page') }}">Account</a></li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="copyright-area">
+      <div class="container">
+        <div class="row">
+          <div class="col-xxl-12">
+            <div class="copyright-text text-center">
+              <p>Copyright &copy; 2026 by <a href="{{ url_for('home') }}">Relator AI</a>. All Rights Reserved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/jquery-1.12.4.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.nice-select.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.zoom.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.meanmenu.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/plugins.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

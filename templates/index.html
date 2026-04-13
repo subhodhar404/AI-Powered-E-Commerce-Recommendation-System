@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Relator AI | Home{% endblock %}
+{% block header_class %}header-transparent{% endblock %}
+{% block header_container_class %}header-border{% endblock %}
+
+{% block content %}
+<section class="slider-area slider-height d-flex align-items-center justify-content-center"
+  style="background-image: url('{{ url_for('static', filename='img/slider/slider-img.png') }}');">
+  <div class="container">
+    <div class="row">
+      <div class="col-xxl-8 offset-xxl-2 col-xl-8 offset-xl-2 col-lg-10 offset-lg-1">
+        <div class="single-slider">
+          <div class="slider-content text-center">
+            <div class="slider-text">
+              <h2>Discover smarter product suggestions for every shopper</h2>
+              <p>Flask backend + four-signal hybrid recommender + frontend UI. Search products, explore the catalog, and generate personalized recommendations from your own dataset.</p>
+            </div>
+            <div class="slider-form mb-40">
+              <form action="{{ url_for('products_page') }}" method="get">
+                <input type="text" name="q" placeholder="Search products by name or brand" autofocus>
+                <button type="submit">Search <i class="fa-solid fa-magnifying-glass"></i></button>
+              </form>
+            </div>
+            <a href="{{ url_for('recommendation_page') }}">Get Personalized Recommendation <i class="fa-solid fa-arrow-right-long"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features-area pt-100 pb-70 gray-bg">
+  <div class="container">
+    {% if not data_ready %}
+    <div class="empty-state">
+      <strong>Dataset missing.</strong> Put `dataset.tsv` beside `app.py`, then reload the page. Current expected path: {{ dataset_path }}
+    </div>
+    {% endif %}
+
+    <div class="row mb-30">
+      <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 mb-30">
+        <div class="stat-card text-center">
+          <h3>Total Rows</h3>
+          <p class="stat-number">{{ summary.rows }}</p>
+        </div>
+      </div>
+      <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-6 mb-30">
+        <div class="stat-card text-center">
+          <h3>Total Products</h3>
+          <p class="stat-number">{{ summary.products }}</p>
+        </div>
+      </div>
+      <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 mb-30">
+        <div class="stat-card text-center">
+          <h3>Data Reality</h3>
+          <p class="stat-number">No User Log</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xxl-6 col-xl-6 col-lg-6 mb-30">
+        <div class="helper-card">
+          <h3>How this app works</h3>
+          <p>Products are cleaned into tags, TF-IDF builds keyword similarity, semantic embeddings capture meaning-level similarity, a preference-profile vector is built from liked seed items, and popularity acts as a light stabilizer. These four signals are merged into one final hybrid ranking.</p>
+          {% if metrics %}
+          <div class="metric-badge">Precision@5: {{ metrics.get('Precision@K', 0) }}</div>
+          <div class="metric-badge">Recall@5: {{ metrics.get('Recall@K', 0) }}</div>
+          <div class="metric-badge">HitRate@5: {{ metrics.get('HitRate@K', 0) }}</div>
+          {% else %}
+          <div class="metric-badge">No user-history metric: dataset is product-centric</div>
+          {% endif %}
+          <div class="metric-badge">Semantic backend: {{ semantic_backend }}</div>
+        </div>
+      </div>
+      <div class="col-xxl-6 col-xl-6 col-lg-6 mb-30">
+        <div class="helper-card">
+          <h3>Quick start for demo</h3>
+          <p>Use the recommendation page, keep the default product name, and optionally add 1-3 liked products as preference seeds. This lets the profile model generate more personal recommendations even though the dataset has no real user log.</p>
+          <div class="metric-badge">{{ summary.data_limitation }}</div>
+          <a class="default-btn" href="{{ url_for('recommendation_page') }}">Open Recommendation Page</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="products-area pt-50 pb-70 fix">
+  <div class="container">
+    <div class="row mb-20">
+      <div class="col-xxl-12">
+        <div class="section-title mb-30 text-center">
+          <h3>Sample Catalog</h3>
+          <span>These cards are driven from your dataset and sorted like a default storefront.</span>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-20">
+        <div class="col-xxl-12">
+          <div class="helper-card">
+            <h3>How to read this page</h3>
+            <p class="mb-10">This homepage presents a default sample catalog from the dataset rather than personalized recommendation output. Items are ranked with rating and review-backed popularity so the interface remains useful before any preference input is provided.</p>
+            <p class="mb-0">Detailed recommendation signals such as `BestSignal`, `Keyword`, `Semantic`, `Profile`, and `Popularity` are shown on the recommendation page after a seed item and optional liked items are submitted.</p>
+          </div>
+        </div>
+    </div>
+    <div class="row dynamic-grid">
+      {% for product in sample_products %}
+      <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
+        <div class="single-product">
+          <div class="product-img">
+            <a href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}">
+              <img src="{{ product.ImageURL or url_for('static', filename='img/products/product1.jpg') }}" alt="{{ product.Name }}" onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/products/product1.jpg') }}';">
+            </a>
+            <div class="product-tags">
+              <span>{{ product.Brand or "Catalog Product" }}</span>
+            </div>
+          </div>
+          <div class="product-content">
+            <span>Rating {{ product.Rating }}</span>
+            <div class="product-ratings mb-10">
+              <a href="#"><i class="fa-solid fa-star"></i></a>
+              <a href="#"><i class="fa-solid fa-star"></i></a>
+              <a href="#"><i class="fa-solid fa-star"></i></a>
+              <a href="#"><i class="fa-solid fa-star"></i></a>
+              <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
+            </div>
+            <h3><a href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}">{{ product.Name }}</a></h3>
+            <div class="product-link">
+              <a class="default-btn shake-btn" href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}">Recommend Similar Items</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
