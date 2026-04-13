@@ -9,7 +9,7 @@ from engine import (
 )
 
 
-app = Flask(__name__, template_folder="templates", static_folder="mechine_learning")
+app = Flask(__name__, template_folder="templates", static_folder="templates")
 
 DEFAULT_SEED_ITEM = "Garnier Whole Blends Repairing Shampoo Honey Treasures, For Damaged Hair, 22 fl. oz."
 DEFAULT_COLLABORATIVE_USER_ID = "0"
