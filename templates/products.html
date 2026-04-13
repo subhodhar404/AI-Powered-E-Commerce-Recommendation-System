@@ -33,16 +33,16 @@
     <div class="row mb-20">
       <div class="col-xxl-7 col-xl-7 col-lg-12 mb-20">
         <div class="helper-card">
-          <h3>What this page does</h3>
-          <p class="mb-10">This page is the searchable product catalog built from the dataset. It helps the user or teacher inspect the raw product collection and choose a good seed item before opening the recommendation engine.</p>
-          <p class="mb-0">It is not ranking by personalized hybrid score. Personalized ranking happens only on the recommendation page.</p>
+          <h3>Catalog overview</h3>
+          <p class="mb-10">This page presents the searchable product catalog built from the dataset. It is designed for browsing, searching, and selecting a seed product before opening the recommendation workflow.</p>
+          <p class="mb-0">Hybrid ranking is applied on the recommendation page, where the selected product is combined with the target user id and the model outputs the final scored results.</p>
         </div>
       </div>
       <div class="col-xxl-5 col-xl-5 col-lg-12 mb-20">
         <div class="helper-card">
-          <h3>Quick demo path</h3>
+          <h3>Quick access</h3>
           <p class="mb-10">{{ summary.products }} unique products are available in the current dataset view.</p>
-          <p class="mb-0">If you want a fast classroom demo, open any card here, or jump directly to <a href="{{ url_for('recommendation_page', item_name=default_item) }}">{{ default_item }}</a> on the recommendation page.</p>
+          <p class="mb-0">You can open any card from this catalog, or jump directly to <a href="{{ url_for('recommendation_page', item_name=default_item, target_user_id=default_user_id) }}">{{ default_item }}</a> to test the recommendation page with the default collaborative user.</p>
         </div>
       </div>
     </div>
@@ -53,7 +53,7 @@
       <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
         <div class="single-product">
           <div class="product-img">
-            <a href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}">
+            <a href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}&target_user_id={{ default_user_id }}">
               <img src="{{ product.ImageURL or url_for('static', filename='img/products/product2.jpg') }}" alt="{{ product.Name }}" onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/products/product2.jpg') }}';">
             </a>
             <div class="product-tags">
@@ -69,9 +69,9 @@
               <a href="#"><i class="fa-solid fa-star"></i></a>
               <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
             </div>
-            <h3><a href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}">{{ product.Name }}</a></h3>
+            <h3><a href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}&target_user_id={{ default_user_id }}">{{ product.Name }}</a></h3>
             <div class="product-link">
-              <a class="default-btn shake-btn" href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}">Get Recommendations</a>
+              <a class="default-btn shake-btn" href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}&target_user_id={{ default_user_id }}">Get Recommendations</a>
             </div>
           </div>
         </div>

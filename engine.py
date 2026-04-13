@@ -19,10 +19,10 @@ except ImportError:  # pragma: no cover - optional runtime dependency.
 DATASET_PATH = Path("dataset.tsv")
 SEMANTIC_MODEL_NAME = "all-MiniLM-L6-v2"
 DEFAULT_HYBRID_WEIGHTS = {
-    "ContentScore": 0.25,
-    "SemanticScore": 0.45,
-    "ProfileScore": 0.20,
-    "PopularityScore": 0.10,
+    "ContentScore": 0.20,
+    "SemanticScore": 0.35,
+    "CollaborativeScore": 0.30,
+    "PopularityScore": 0.15,
 }
 
 
@@ -39,7 +39,7 @@ def empty_recommendation_frame():
             "Rating",
             "ContentScore",
             "SemanticScore",
-            "ProfileScore",
+            "CollaborativeScore",
             "PopularityScore",
             "Score",
             "BestSignal",
@@ -48,9 +48,15 @@ def empty_recommendation_frame():
     )
 
 
-# Load the dataset, clean the fields, and build stable product ids.
+# Extract a notebook-compatible user id from the raw row identifier.
+def extract_user_id(raw_row_id):
+    match = re.search(r"(\d+)", str(raw_row_id))
+    return match.group(1) if match else ""
+
+
+# Load the dataset, clean the fields, and build stable product and user ids.
 def load_and_prepare_data(dataset_path=DATASET_PATH):
-    df = pd.read_csv(dataset_path, sep="\t")
+    df = pd.read_csv(dataset_path, sep="	")
 
     selected_columns = [
         "Uniq Id",
@@ -91,10 +97,12 @@ def load_and_prepare_data(dataset_path=DATASET_PATH):
 
     df["RawRowID"] = df["RawRowID"].astype(str).str.strip()
     df["RawProdID"] = df["RawProdID"].astype(str).str.strip()
+    df["UserID"] = df["RawRowID"].apply(extract_user_id)
     df = df[
         (df["RawProdID"] != "")
         & (df["RawProdID"].str.lower() != "nan")
         & (df["Name"].astype(str).str.strip() != "")
+        & (df["UserID"] != "")
     ].copy()
 
     product_keys = sorted(df["RawProdID"].unique().tolist())
@@ -209,12 +217,29 @@ def resolve_item_name(query, item_df):
     return close_matches[0] if close_matches else ""
 
 
-# Parse liked items from the textarea into a clean list of seed names.
-def parse_profile_inputs(liked_items_text):
-    if not liked_items_text:
-        return []
-    normalized_text = liked_items_text.replace("\r\n", "\n").replace("|", "\n")
-    return [part.strip() for part in normalized_text.split("\n") if part.strip()]
+# Resolve a requested user id against the collaborative model index.
+def resolve_user_id(target_user_id, collaborative_model):
+    user_item_matrix = collaborative_model.get("user_item_matrix")
+    default_user_id = str(collaborative_model.get("default_user_id", "") or "")
+    if user_item_matrix is None or user_item_matrix.empty:
+        return ""
+
+    available_ids = [str(user_id) for user_id in user_item_matrix.index.tolist()]
+    available_lookup = set(available_ids)
+    query = str(target_user_id).strip() if target_user_id is not None else ""
+
+    if not query:
+        return default_user_id or available_ids[0]
+    if query in available_lookup:
+        return query
+    if query.endswith(".0") and query[:-2] in available_lookup:
+        return query[:-2]
+
+    digits = re.search(r"(\d+)", query)
+    if digits and digits.group(1) in available_lookup:
+        return digits.group(1)
+
+    return default_user_id or available_ids[0]
 
 
 # Build the TF-IDF model used for keyword-based similarity.
@@ -280,6 +305,33 @@ def build_semantic_model(df, model_name=SEMANTIC_MODEL_NAME):
     }
 
 
+# Build the collaborative model from the notebook-style user-item matrix.
+def build_collaborative_model(df):
+    item_df = build_item_frame(df)
+    if df.empty:
+        return {
+            "item_df": item_df,
+            "user_item_matrix": pd.DataFrame(),
+            "similarity_matrix": np.empty((0, 0)),
+            "default_user_id": "",
+            "user_count": 0,
+        }
+
+    user_item_matrix = df.pivot_table(
+        index="UserID", columns="ProdID", values="Rating", aggfunc="mean"
+    ).fillna(0)
+    similarity_matrix = cosine_similarity(user_item_matrix) if not user_item_matrix.empty else np.empty((0, 0))
+    user_activity = df.groupby("UserID")["ProdID"].nunique().sort_values(ascending=False)
+    default_user_id = str(user_activity.index[0]) if not user_activity.empty else ""
+    return {
+        "item_df": item_df,
+        "user_item_matrix": user_item_matrix,
+        "similarity_matrix": similarity_matrix,
+        "default_user_id": default_user_id,
+        "user_count": int(user_item_matrix.index.nunique()),
+    }
+
+
 # Shape a scored recommendation frame for a single ranking signal.
 def create_scored_frame(item_df, selected_indices, score_map, score_column):
     if not selected_indices:
@@ -290,7 +342,7 @@ def create_scored_frame(item_df, selected_indices, score_map, score_column):
     ].copy()
     recs["ContentScore"] = 0.0
     recs["SemanticScore"] = 0.0
-    recs["ProfileScore"] = 0.0
+    recs["CollaborativeScore"] = 0.0
     recs["PopularityScore"] = recs["ProdID"].map(
         item_df.set_index("ProdID")["PopularityScore"]
     ).fillna(0.0)
@@ -314,9 +366,7 @@ def content_based_recommendations(df, item_name, top_n=10, content_model=None):
     item_index = item_df[item_df["Name"] == resolved_name].index[0]
     similarity_matrix = content_model["similarity_matrix"]
     similarity_scores = list(enumerate(similarity_matrix[item_index]))
-    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)[
-        1 : top_n + 1
-    ]
+    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)[1 : top_n + 1]
 
     selected_indices = [idx for idx, _ in similarity_scores]
     score_map = {item_df.iloc[idx]["ProdID"]: score for idx, score in similarity_scores}
@@ -336,55 +386,66 @@ def semantic_embedding_recommendations(df, item_name, top_n=10, semantic_model=N
     item_index = item_df[item_df["Name"] == resolved_name].index[0]
     similarity_matrix = semantic_model["similarity_matrix"]
     similarity_scores = list(enumerate(similarity_matrix[item_index]))
-    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)[
-        1 : top_n + 1
-    ]
+    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)[1 : top_n + 1]
 
     selected_indices = [idx for idx, _ in similarity_scores]
     score_map = {item_df.iloc[idx]["ProdID"]: score for idx, score in similarity_scores}
     return create_scored_frame(item_df, selected_indices, score_map, "SemanticScore"), resolved_name
 
 
-# Build a taste profile from liked items and retrieve similar products.
-def user_profile_recommendations(
+# Return recommendations from user-user similarity over the notebook-style interaction matrix.
+def collaborative_filtering_recommendations(
     df,
-    liked_item_names,
+    target_user_id,
     top_n=10,
-    semantic_model=None,
+    collaborative_model=None,
+    min_rating=4,
 ):
-    if semantic_model is None:
-        semantic_model = build_semantic_model(df)
+    if collaborative_model is None:
+        collaborative_model = build_collaborative_model(df)
 
-    item_df = semantic_model["item_df"]
-    embeddings = semantic_model["embeddings"]
+    item_df = collaborative_model["item_df"]
+    user_item_matrix = collaborative_model["user_item_matrix"]
+    similarity_matrix = collaborative_model["similarity_matrix"]
+    resolved_user_id = resolve_user_id(target_user_id, collaborative_model)
 
-    resolved_names = []
-    for name in liked_item_names:
-        resolved_name = resolve_item_name(name, item_df)
-        if resolved_name and resolved_name not in resolved_names:
-            resolved_names.append(resolved_name)
+    if not resolved_user_id or user_item_matrix.empty:
+        return empty_recommendation_frame(), ""
 
-    if not resolved_names:
-        return empty_recommendation_frame(), []
+    target_user_index = user_item_matrix.index.get_loc(resolved_user_id)
+    similar_user_indices = similarity_matrix[target_user_index].argsort()[::-1][1:]
+    seen_items = set(df[df["UserID"] == resolved_user_id]["ProdID"])
+    candidate_scores = {}
 
-    liked_positions = item_df[item_df["Name"].isin(resolved_names)].index.tolist()
-    if not liked_positions:
-        return empty_recommendation_frame(), []
+    for user_index in similar_user_indices:
+        similarity_score = float(similarity_matrix[target_user_index][user_index])
+        if similarity_score <= 0:
+            continue
 
-    profile_vector = embeddings[liked_positions].mean(axis=0, keepdims=True)
-    profile_scores = cosine_similarity(profile_vector, embeddings).ravel()
-    seen_names = set(resolved_names)
+        similar_user_id = str(user_item_matrix.index[user_index])
+        similar_user_rows = df[df["UserID"] == similar_user_id]
+        for _, row in similar_user_rows.iterrows():
+            prod_id = row["ProdID"]
+            if prod_id in seen_items or row["Rating"] < min_rating:
+                continue
+            candidate_scores[prod_id] = candidate_scores.get(prod_id, 0.0) + similarity_score * float(row["Rating"])
 
-    candidate_indices = [
-        idx
-        for idx in profile_scores.argsort()[::-1]
-        if item_df.iloc[idx]["Name"] not in seen_names
-    ][:top_n]
+    if not candidate_scores:
+        return empty_recommendation_frame(), resolved_user_id
 
-    score_map = {
-        item_df.iloc[idx]["ProdID"]: float(profile_scores[idx]) for idx in candidate_indices
-    }
-    return create_scored_frame(item_df, candidate_indices, score_map, "ProfileScore"), resolved_names
+    max_score = max(candidate_scores.values())
+    if max_score > 0:
+        candidate_scores = {
+            prod_id: score / max_score for prod_id, score in candidate_scores.items()
+        }
+
+    top_items = sorted(candidate_scores.items(), key=lambda x: x[1], reverse=True)[:top_n]
+    score_map = dict(top_items)
+    selected_ids = [prod_id for prod_id, _ in top_items]
+    selected_indices = item_df[item_df["ProdID"].isin(selected_ids)].index.tolist()
+    recs = create_scored_frame(item_df, selected_indices, score_map, "CollaborativeScore")
+    recs = recs.sort_values(by="CollaborativeScore", ascending=False).reset_index(drop=True)
+    return recs, resolved_user_id
 
 
 # Return a fallback list driven by rating and review-backed popularity.
@@ -397,7 +458,7 @@ def popularity_recommendations(df, top_n=10, item_df=None, excluded_names=None):
     ).head(top_n)
     recs["ContentScore"] = 0.0
     recs["SemanticScore"] = 0.0
-    recs["ProfileScore"] = 0.0
+    recs["CollaborativeScore"] = 0.0
     recs["Score"] = recs["PopularityScore"]
     recs["BestSignal"] = "Popularity"
     recs["SignalCount"] = (recs[["PopularityScore"]] > 0).sum(axis=1)
@@ -412,7 +473,7 @@ def popularity_recommendations(df, top_n=10, item_df=None, excluded_names=None):
             "Rating",
             "ContentScore",
             "SemanticScore",
-            "ProfileScore",
+            "CollaborativeScore",
             "PopularityScore",
             "Score",
             "BestSignal",
@@ -421,14 +482,15 @@ def popularity_recommendations(df, top_n=10, item_df=None, excluded_names=None):
     ].reset_index(drop=True)
 
 
-# Combine content, semantic, profile, and popularity signals into one ranking.
+# Combine content, semantic, collaborative, and popularity signals into one ranking.
 def hybrid_recommendation(
     df,
     item_name,
-    liked_item_names=None,
+    target_user_id=None,
     top_n=10,
     content_model=None,
     semantic_model=None,
+    collaborative_model=None,
     weights=None,
 ):
     weights = weights or DEFAULT_HYBRID_WEIGHTS
@@ -436,19 +498,20 @@ def hybrid_recommendation(
         content_model = build_content_model(df)
     if semantic_model is None:
         semantic_model = build_semantic_model(df)
+    if collaborative_model is None:
+        collaborative_model = build_collaborative_model(df)
 
     content_rec, resolved_seed_item = content_based_recommendations(
         df, item_name, top_n=top_n * 2, content_model=content_model
     )
-    semantic_rec, resolved_semantic_item = semantic_embedding_recommendations(
+    semantic_rec, _ = semantic_embedding_recommendations(
         df, item_name, top_n=top_n * 2, semantic_model=semantic_model
     )
-
-    profile_inputs = liked_item_names or []
-    if resolved_seed_item:
-        profile_inputs = [resolved_seed_item] + profile_inputs
-    profile_rec, resolved_profile_items = user_profile_recommendations(
-        df, profile_inputs, top_n=top_n * 2, semantic_model=semantic_model
+    collaborative_rec, resolved_target_user = collaborative_filtering_recommendations(
+        df,
+        target_user_id,
+        top_n=top_n * 2,
+        collaborative_model=collaborative_model,
     )
 
     item_df = semantic_model["item_df"][
@@ -464,8 +527,10 @@ def hybrid_recommendation(
         ]
     ].copy()
 
-    excluded_names = [name for name in [resolved_seed_item, resolved_semantic_item] if name]
-    excluded_names.extend(resolved_profile_items)
+    seen_prod_ids = set(df[df["UserID"] == resolved_target_user]["ProdID"]) if resolved_target_user else set()
+    seed_prod_ids = set(item_df[item_df["Name"] == resolved_seed_item]["ProdID"]) if resolved_seed_item else set()
+    excluded_prod_ids = seen_prod_ids | seed_prod_ids
+    excluded_names = item_df[item_df["ProdID"].isin(excluded_prod_ids)]["Name"].tolist()
     popularity_rec = popularity_recommendations(
         df, top_n=top_n * 2, item_df=semantic_model["item_df"], excluded_names=excluded_names
     )
@@ -475,7 +540,7 @@ def hybrid_recommendation(
     ).merge(
         semantic_rec[["ProdID", "SemanticScore"]], on="ProdID", how="left"
     ).merge(
-        profile_rec[["ProdID", "ProfileScore"]], on="ProdID", how="left"
+        collaborative_rec[["ProdID", "CollaborativeScore"]], on="ProdID", how="left"
     ).merge(
         popularity_rec[["ProdID", "PopularityScore"]], on="ProdID", how="left", suffixes=("", "_pop")
     )
@@ -488,20 +553,21 @@ def hybrid_recommendation(
 
     score_columns = list(DEFAULT_HYBRID_WEIGHTS.keys())
     combined[score_columns] = combined[score_columns].fillna(0.0)
-    combined = combined[~combined["Name"].isin(set(excluded_names))].copy()
+    if excluded_prod_ids:
+        combined = combined[~combined["ProdID"].isin(excluded_prod_ids)].copy()
     combined = combined[combined[score_columns].sum(axis=1) > 0].copy()
 
     if combined.empty:
         return empty_recommendation_frame(), {
             "ResolvedSeedItem": resolved_seed_item,
-            "ResolvedProfileItems": resolved_profile_items,
+            "ResolvedTargetUser": resolved_target_user,
         }
 
     combined["Score"] = sum(combined[col] * weights[col] for col in score_columns)
     best_signal_labels = {
         "ContentScore": "Keyword Similarity",
         "SemanticScore": "Semantic Embedding",
-        "ProfileScore": "Preference Profile",
+        "CollaborativeScore": "Collaborative Filtering",
         "PopularityScore": "Popularity",
     }
     combined["BestSignal"] = combined[score_columns].idxmax(axis=1).map(best_signal_labels)
@@ -511,12 +577,12 @@ def hybrid_recommendation(
         combined.sort_values(by=["Score", "SignalCount"], ascending=[False, False]).head(top_n),
         {
             "ResolvedSeedItem": resolved_seed_item,
-            "ResolvedProfileItems": resolved_profile_items,
+            "ResolvedTargetUser": resolved_target_user,
         },
     )
 
 
-# Keep evaluation disabled when the dataset cannot support honest user metrics.
+# Keep evaluation disabled when the dataset cannot support honest offline metrics.
 def evaluate_hybrid_recommender(*args, **kwargs):
     return {}
 
@@ -525,6 +591,7 @@ def evaluate_hybrid_recommender(*args, **kwargs):
 def print_project_summary(df):
     print("Number of rows:", len(df))
     print("Number of products:", df["ProdID"].nunique())
+    print("Number of users:", df["UserID"].nunique())
     print("Number of raw product ids:", df["RawProdID"].nunique())
 
 
@@ -580,15 +647,13 @@ def dataframe_to_products(df):
                 "RawProdID": str(row.get("RawProdID", "") or ""),
                 "Name": str(row["Name"]),
                 "Brand": "" if pd.isna(row.get("Brand")) else str(row.get("Brand")),
-                "ImageURL": ""
-                if pd.isna(row.get("ImageURL"))
-                else str(row.get("ImageURL")),
+                "ImageURL": "" if pd.isna(row.get("ImageURL")) else str(row.get("ImageURL")),
                 "ReviewCount": int(float(row.get("ReviewCount", 0) or 0)),
                 "Rating": round(float(row.get("Rating", 0) or 0), 2),
                 "Score": round(float(row.get("Score", 0) or 0), 4),
                 "ContentScore": round(float(row.get("ContentScore", 0) or 0), 4),
                 "SemanticScore": round(float(row.get("SemanticScore", 0) or 0), 4),
-                "ProfileScore": round(float(row.get("ProfileScore", 0) or 0), 4),
+                "CollaborativeScore": round(float(row.get("CollaborativeScore", 0) or 0), 4),
                 "PopularityScore": round(float(row.get("PopularityScore", 0) or 0), 4),
                 "BestSignal": str(row.get("BestSignal", "") or ""),
                 "SignalCount": int(float(row.get("SignalCount", 0) or 0)),
@@ -618,12 +683,14 @@ def build_app_state():
             "catalog": pd.DataFrame(),
             "content_model": None,
             "semantic_model": None,
+            "collaborative_model": None,
             "semantic_backend": "not-loaded",
             "semantic_model_name": "",
             "metrics": {},
             "summary": {
                 "rows": 0,
                 "products": 0,
+                "users": 0,
                 "data_limitation": "Dataset not found.",
             },
         }
@@ -631,6 +698,7 @@ def build_app_state():
     data = load_and_prepare_data(dataset_path)
     catalog = get_catalog(data)
     content_model = build_content_model(data)
+    collaborative_model = build_collaborative_model(data)
 
     return {
         "dataset_path": str(dataset_path),
@@ -638,15 +706,17 @@ def build_app_state():
         "catalog": catalog,
         "content_model": content_model,
         "semantic_model": None,
+        "collaborative_model": collaborative_model,
         "semantic_backend": "lazy-load",
         "semantic_model_name": "",
         "metrics": {},
         "summary": {
             "rows": int(len(data)),
             "products": int(data["ProdID"].nunique()),
+            "users": int(data["UserID"].nunique()),
             "data_limitation": (
-                "The dataset is product-centric, not user-history-centric. "
-                "Final production uses content, semantic, profile-seed, and popularity signals."
+                "Collaborative filtering follows the notebook preprocessing by extracting user ids "
+                "from the dataset's Uniq Id field, then combining that signal with content, semantic, and popularity scores."
             ),
         },
     }
@@ -664,15 +734,17 @@ if __name__ == "__main__":
 
         content_model = build_content_model(data)
         semantic_model = build_semantic_model(data)
-
+        collaborative_model = build_collaborative_model(data)
+        default_user_id = collaborative_model.get("default_user_id", "")
         sample_item = data["Name"].iloc[0]
         sample_recommendations, meta = hybrid_recommendation(
             data,
             sample_item,
-            liked_item_names=[],
+            target_user_id=default_user_id,
             top_n=5,
             content_model=content_model,
             semantic_model=semantic_model,
+            collaborative_model=collaborative_model,
         )
         print("\nSample final hybrid recommendations:")
         print(
@@ -682,7 +754,7 @@ if __name__ == "__main__":
                     "Score",
                     "ContentScore",
                     "SemanticScore",
-                    "ProfileScore",
+                    "CollaborativeScore",
                     "PopularityScore",
                     "BestSignal",
                 ]

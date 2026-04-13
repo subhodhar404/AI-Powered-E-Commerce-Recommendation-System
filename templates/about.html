@@ -28,8 +28,8 @@
       </div>
       <div class="col-xxl-4 col-xl-4 col-lg-4 mb-30">
         <div class="helper-card text-center">
-          <h3>Profile + Popularity</h3>
-          <p>The final system builds a preference profile from manually liked seed items and blends that with a popularity prior because this dataset does not contain real user histories.</p>
+          <h3>Collaborative + Popularity</h3>
+          <p>The final system follows the notebook pipeline, builds a user-item matrix from extracted user ids, and blends collaborative filtering with a popularity prior.</p>
         </div>
       </div>
     </div>
@@ -37,11 +37,11 @@
       <div class="col-xxl-12">
         <div class="helper-card">
           <h3>Current project snapshot</h3>
-          <p class="mb-10">Rows: {{ summary.rows }} | Products: {{ summary.products }}</p>
+          <p class="mb-10">Rows: {{ summary.rows }} | Products: {{ summary.products }} | Collaborative Users: {{ summary.users }}</p>
           {% if metrics %}
           <p class="mb-0">Evaluation metrics: Precision@5 = {{ metrics.get('Precision@K', 0) }}, Recall@5 = {{ metrics.get('Recall@K', 0) }}, HitRate@5 = {{ metrics.get('HitRate@K', 0) }}</p>
           {% else %}
-          <p class="mb-0">Formal user-history ranking metrics are not shown because the dataset is product-centric and does not contain repeated user logs.</p>
+          <p class="mb-0">Offline metrics are not shown in the UI. The app currently focuses on explainable hybrid ranking built from content, semantic, collaborative, and popularity signals.</p>
           {% endif %}
           <p class="mb-0 mt-10">{{ summary.data_limitation }}</p>
           <p class="mb-0 mt-10">Semantic backend status: {{ semantic_backend }} {% if semantic_model_name %}({{ semantic_model_name }}){% endif %}</p>

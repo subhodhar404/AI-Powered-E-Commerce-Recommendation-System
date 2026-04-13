@@ -14,7 +14,7 @@
           <div class="slider-content text-center">
             <div class="slider-text">
               <h2>Discover smarter product suggestions for every shopper</h2>
-              <p>Flask backend + four-signal hybrid recommender + frontend UI. Search products, explore the catalog, and generate personalized recommendations from your own dataset.</p>
+              <p>Flask backend + content, semantic, collaborative, and popularity signals. Search products, explore the catalog, and generate hybrid recommendations from your own dataset.</p>
             </div>
             <div class="slider-form mb-40">
               <form action="{{ url_for('products_page') }}" method="get">
@@ -53,8 +53,8 @@
       </div>
       <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12 mb-30">
         <div class="stat-card text-center">
-          <h3>Data Reality</h3>
-          <p class="stat-number">No User Log</p>
+          <h3>Collaborative Users</h3>
+          <p class="stat-number">{{ summary.users }}</p>
         </div>
       </div>
     </div>
@@ -63,13 +63,13 @@
       <div class="col-xxl-6 col-xl-6 col-lg-6 mb-30">
         <div class="helper-card">
           <h3>How this app works</h3>
-          <p>Products are cleaned into tags, TF-IDF builds keyword similarity, semantic embeddings capture meaning-level similarity, a preference-profile vector is built from liked seed items, and popularity acts as a light stabilizer. These four signals are merged into one final hybrid ranking.</p>
+          <p>Products are cleaned into tags, TF-IDF builds keyword similarity, semantic embeddings capture meaning-level similarity, collaborative filtering uses the notebook-style user-item matrix, and popularity acts as a light stabilizer. These four signals are merged into one final hybrid ranking.</p>
           {% if metrics %}
           <div class="metric-badge">Precision@5: {{ metrics.get('Precision@K', 0) }}</div>
           <div class="metric-badge">Recall@5: {{ metrics.get('Recall@K', 0) }}</div>
           <div class="metric-badge">HitRate@5: {{ metrics.get('HitRate@K', 0) }}</div>
           {% else %}
-          <div class="metric-badge">No user-history metric: dataset is product-centric</div>
+          <div class="metric-badge">Collaborative signal follows the notebook preprocessing pipeline</div>
           {% endif %}
           <div class="metric-badge">Semantic backend: {{ semantic_backend }}</div>
         </div>
@@ -77,7 +77,8 @@
       <div class="col-xxl-6 col-xl-6 col-lg-6 mb-30">
         <div class="helper-card">
           <h3>Quick start for demo</h3>
-          <p>Use the recommendation page, keep the default product name, and optionally add 1-3 liked products as preference seeds. This lets the profile model generate more personal recommendations even though the dataset has no real user log.</p>
+          <p>Use the recommendation page, keep the default product name, and use the prefilled collaborative user id or try another one from the dataset. The hybrid model will combine item similarity with user-user recommendation signals.</p>
+          <div class="metric-badge">Default collaborative user: {{ default_user_id or 'Not available' }}</div>
           <div class="metric-badge">{{ summary.data_limitation }}</div>
           <a class="default-btn" href="{{ url_for('recommendation_page') }}">Open Recommendation Page</a>
         </div>
@@ -101,7 +102,7 @@
           <div class="helper-card">
             <h3>How to read this page</h3>
             <p class="mb-10">This homepage presents a default sample catalog from the dataset rather than personalized recommendation output. Items are ranked with rating and review-backed popularity so the interface remains useful before any preference input is provided.</p>
-            <p class="mb-0">Detailed recommendation signals such as `BestSignal`, `Keyword`, `Semantic`, `Profile`, and `Popularity` are shown on the recommendation page after a seed item and optional liked items are submitted.</p>
+            <p class="mb-0">Detailed recommendation signals such as `BestSignal`, `Keyword`, `Semantic`, `Collaborative`, and `Popularity` are shown on the recommendation page after a seed item and target user id are submitted.</p>
           </div>
         </div>
     </div>
@@ -110,7 +111,7 @@
       <div class="col-xxl-4 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-30">
         <div class="single-product">
           <div class="product-img">
-            <a href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}">
+            <a href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}&target_user_id={{ default_user_id }}">
               <img src="{{ product.ImageURL or url_for('static', filename='img/products/product1.jpg') }}" alt="{{ product.Name }}" onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/products/product1.jpg') }}';">
             </a>
             <div class="product-tags">
@@ -126,9 +127,9 @@
               <a href="#"><i class="fa-solid fa-star"></i></a>
               <a href="#"><i class="fa-solid fa-star-half-stroke"></i></a>
             </div>
-            <h3><a href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}">{{ product.Name }}</a></h3>
+            <h3><a href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}&target_user_id={{ default_user_id }}">{{ product.Name }}</a></h3>
             <div class="product-link">
-              <a class="default-btn shake-btn" href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}">Recommend Similar Items</a>
+              <a class="default-btn shake-btn" href="{{ url_for('recommendation_page') }}?item_name={{ product.Name | urlencode }}&target_user_id={{ default_user_id }}">Recommend Similar Items</a>
             </div>
           </div>
         </div>
